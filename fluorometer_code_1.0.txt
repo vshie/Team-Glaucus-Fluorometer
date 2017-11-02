@@ -2,6 +2,9 @@
 #include "MS5837.h"
 MS5837 sensor;
 const int photoDiode_PIN = 14; 
+int recordInterval= 250; //in milliseconds
+elapsedMillis sampleClock;
+
 
 void setup() {
   Serial.begin(9600);
@@ -9,7 +12,7 @@ void setup() {
   Serial.println("Starting");
   
   Wire.begin();
-
+  delay(800); //alleviates many reliability issues
   // Initialize pressure sensor
   // Returns true if initialization was successful
   // We can't continue with the rest of the program unless we can initialize the sensor
@@ -26,7 +29,8 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+ 
+ // put your main code here, to run repeatedly:
 float pd_value = analogRead(photoDiode_PIN);
 float pd_voltage = pd_value/1024*3.3;
 Serial.print("PD: ");
@@ -48,12 +52,14 @@ delay(1000);
   Serial.print("Depth: "); 
   Serial.print(sensor.depth()); 
   Serial.println(" m");
-  
-  Serial.print("Altitude: "); 
-  Serial.print(sensor.altitude()); 
-  Serial.println(" m above mean sea level");
 
-  delay(1000);
+  if (sampleClock > recordInterval) {
+    //record data to SD
+    sampleClock = 0;
+    
+    }
+  
+  
 
 
 }
